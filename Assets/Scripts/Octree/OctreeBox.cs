@@ -3,7 +3,6 @@
 [Serializable]
 public class OctreeBox
 {
-
     private float top;
     private float bottom;
     private float left;

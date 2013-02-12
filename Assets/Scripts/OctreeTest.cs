@@ -1,58 +1,39 @@
-﻿using UnityEditor;
+﻿using System.Collections;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
+using System;
 
 public class OctreeTest:MonoBehaviour
 {
     public GameObject TestObject;
+    private Octree ocTree;
+    private Vector3 oldPos;
+    private ArrayList result;
     
-    private Octree ocTree; 
-
-    void Start ()
+    private void Start ()
     {
         var size = 1;
-        ocTree = new Octree(
-            size,
-            -size,
-            -size,
-            size,
-            size,
-            -size,
-            4
-            );
-
-        size = 10;
-        for (var x = 0; x < size; x++)
-        {
-            for (var y = 0; y < size; y++)
-            {
-                for (var z = 0; z < size; z++)
-                {
-                    var position = new Vector3(x, y, z);
-                    ocTree.AddNode(position,new OcTreeNodeObject(x+y+z, position));
-                }
-            }
-        }
-        
+        ocTree = new Octree( size,-size,-size,
+                             size,size,-size,1);
     }
 
     void OnDrawGizmos()
     {
+        if (result != null)
+            foreach (var i in result.Cast<OcTreeNodeObject>())
+                Gizmos.DrawWireCube(i.Position, Vector3.one);
+            
         if (ocTree == null) return;
+        if (oldPos == TestObject.transform.position) return;
 
-        var result = ocTree.Top.GetNodes(TestObject.transform.position, TestObject.renderer.bounds.size.x/2);
-
-
-        foreach (var item in result)
-        {
-            var i = (OcTreeNodeObject) item;
-            Gizmos.DrawWireCube(i.Position, Vector3.one);
-        }
-
+        result = ocTree.Top.GetNodes(TestObject.transform.position, TestObject.renderer.bounds.size.x/2);
+        if (result.Count == 0)
+            ocTree.AddNode(TestObject.transform.position,  new OcTreeNodeObject(11, TestObject.transform.position));
+        
         Handles.Label(new Vector3(0, 0, 0), "result.Count :" + result.Count);
+        oldPos = TestObject.transform.position;
     }
-
-
-
 }
 
 
@@ -66,7 +47,5 @@ class OcTreeNodeObject
     {
         Id = id;
         Position = pos;
-
     }
-
 }
