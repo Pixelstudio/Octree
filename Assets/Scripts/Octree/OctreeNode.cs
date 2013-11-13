@@ -191,6 +191,9 @@ public class OctreeNode : IOctree
         object closest = null;
         if (Branch == null)
         {
+           // var childDistance = this.Bounds.BorderDistance(x, y, z);
+            //if (childDistance > shortestDistance)
+           //     return null;
             foreach (OctreeLeaf leaf in Items)
             {
                 var distance = Math.Sqrt(
